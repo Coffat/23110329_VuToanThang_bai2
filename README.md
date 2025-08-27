@@ -3,7 +3,6 @@
 ## Thông tin sinh viên
 - **Họ và tên**: Vũ Toàn Thắng
 - **MSSV**: 23110329
-- **Lớp**: [Tên lớp của bạn]
 
 ## Mô tả dự án
 Ứng dụng web đăng nhập/đăng ký sử dụng Java Servlet, JSP và SQL Server.
