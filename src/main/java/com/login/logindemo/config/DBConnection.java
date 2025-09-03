@@ -12,7 +12,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class DBConnection {
     // Database connection parameters
-    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=BT2;encrypt=false;trustServerCertificate=true;integratedSecurity=false;loginTimeout=30;autoReconnect=true;applicationName=LoginDemo";
+    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=BT2;encrypt=false;trustServerCertificate=true;integratedSecurity=false;loginTimeout=30;autoReconnect=true;applicationName=LoginDemo;sendStringParametersAsUnicode=true";
     private static final String DB_USERNAME = "sa";
     private static final String DB_PASSWORD = "Admin@123";
     

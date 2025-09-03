@@ -7,30 +7,44 @@
     <title>Đăng Ký - Hệ Thống Quản Lý</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
-            padding: 50px;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .register-container {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
             padding: 30px;
-            max-width: 500px;
-            margin: 0 auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 480px;
+            margin: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #667eea;
+            font-weight: 800;
+            letter-spacing: 0.5px;
         }
 
         .register-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .register-header h1 {
             color: #333;
-            margin-bottom: 10px;
+            margin: 0 0 8px 0;
+            font-size: 22px;
         }
 
         .form-group {
@@ -46,15 +60,17 @@
 
         .form-group input {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
             font-size: 14px;
+            background: #fff;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #007bff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
         }
 
         .form-row {
@@ -68,18 +84,20 @@
 
         .register-btn {
             width: 100%;
-            padding: 10px;
-            background-color: #28a745;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
-            margin-bottom: 20px;
+            margin-top: 10px;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
         }
 
         .register-btn:hover {
-            background-color: #218838;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
         .alert {
@@ -106,7 +124,7 @@
         }
 
         .login-link a {
-            color: #007bff;
+            color: #667eea;
             text-decoration: none;
         }
 

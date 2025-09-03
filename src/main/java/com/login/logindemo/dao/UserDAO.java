@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 /**
  * Data Access Object for User operations
@@ -233,6 +232,50 @@ public class UserDAO {
             
         } catch (SQLException e) {
             System.err.println("Error during user registration: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+                if (conn != null) DBConnection.returnConnection(conn);
+            } catch (SQLException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Update user password by email
+     * @param email Email of the user
+     * @param newPassword New password
+     * @return true if update successful, false otherwise
+     */
+    public boolean updatePasswordByEmail(String email, String newPassword) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        String sql = "UPDATE [User] SET password = ? WHERE email = ?";
+        
+        try {
+            conn = DBConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, newPassword);
+            pstmt.setString(2, email);
+            
+            int rowsAffected = pstmt.executeUpdate();
+            
+            if (rowsAffected > 0) {
+                System.out.println("Password updated successfully for email: " + email);
+                return true;
+            } else {
+                System.out.println("No user found with email: " + email);
+                return false;
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error updating password: " + e.getMessage());
             System.err.println("SQL State: " + e.getSQLState());
             System.err.println("Error Code: " + e.getErrorCode());
             e.printStackTrace();

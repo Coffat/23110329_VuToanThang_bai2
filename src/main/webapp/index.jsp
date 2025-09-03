@@ -9,13 +9,11 @@
     // Get user information from session
     String username = (String) session.getAttribute("username");
     String fullname = (String) session.getAttribute("fullname");
-    String email = (String) session.getAttribute("email");
     String rolename = (String) session.getAttribute("rolename");
     Integer roleid = (Integer) session.getAttribute("roleid");
     
     if (username == null) username = "";
     if (fullname == null) fullname = username;
-    if (email == null) email = "Chưa cập nhật";
     if (rolename == null) rolename = "User";
     if (roleid == null) roleid = 3;
 %>
@@ -27,289 +25,443 @@
     <title>Trang Chủ - Hệ Thống Quản Lý</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .header {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 0 20px;
         }
 
-        .header h1 {
-            color: white;
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
         }
 
-        .header-actions {
+        .nav-links {
             display: flex;
-            gap: 10px;
+            gap: 30px;
+            align-items: center;
         }
 
-        .nav-btn {
-            background-color: rgba(255,255,255,0.2);
-            color: white;
-            padding: 8px 16px;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn:hover {
-            background-color: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .card {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card h2 {
+        .nav-link {
             color: #333;
-            margin-top: 0;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        .hero-section h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-section p {
+            font-size: 20px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .welcome-card h2 {
+            color: #333;
+            font-size: 32px;
             margin-bottom: 15px;
         }
 
-        .info-row {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
+        .welcome-card p {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 30px;
         }
 
-        .info-row:last-child {
-            border-bottom: none;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
         }
 
-        .info-label {
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 24px;
             font-weight: bold;
             color: #333;
+            margin-bottom: 15px;
         }
 
-        .info-value {
+        .feature-description {
             color: #666;
-            margin-left: 10px;
+            line-height: 1.6;
+            margin-bottom: 25px;
         }
 
-        .role-badge {
-            background-color: #007bff;
+        .feature-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 12px;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
         }
 
-        .role-badge.admin {
-            background-color: #dc3545;
-        }
-
-        .role-badge.manager {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .session-info {
-            background: #e7f3ff;
-            border: 1px solid #b3d7ff;
-            border-radius: 4px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .session-info h3 {
-            margin-top: 0;
-            color: #0056b3;
-        }
-
-        .session-info p {
-            margin: 5px 0;
-            color: #0056b3;
-            font-size: 13px;
+        .feature-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
         }
 
         .quick-actions {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-actions h3 {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .actions-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
 
         .action-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 25px;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 15px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .action-btn:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
         .action-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            margin-bottom: 10px;
         }
 
         .action-text {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 16px;
         }
 
-        .card {
-            background: white;
-            border: none;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-section h1 {
+                font-size: 32px;
+            }
+            
+            .hero-section p {
+                font-size: 16px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home" class="logo">🏠 Hệ Thống Quản Lý</a>
+            <div class="nav-links">
+                <a href="home" class="nav-link">Trang Chủ</a>
+                <a href="category" class="nav-link">Danh Mục</a>
+                <a href="profile.jsp" class="nav-link">Hồ Sơ</a>
+            </div>
+            <div class="user-info">
+                <span>Xin chào, <strong><%= fullname %></strong></span>
+                <div class="user-avatar">
+                    <%= fullname.substring(0, 1).toUpperCase() %>
+                </div>
+                <a href="logout" class="nav-link" onclick="return confirm('Bạn có chắc muốn đăng xuất?')">Đăng xuất</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>Chào mừng, <%= fullname %>!</h1>
-            <div class="header-actions">
-                <a href="profile" class="nav-btn">Hồ sơ</a>
-                <a href="logout" class="logout-btn">Đăng Xuất</a>
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>Chào mừng đến với Hệ Thống Quản Lý</h1>
+            <p>Một nền tảng toàn diện giúp bạn quản lý thông tin và dữ liệu một cách hiệu quả</p>
+        </div>
+
+        <!-- Welcome Card -->
+        <div class="welcome-card">
+            <h2>Xin chào, <%= fullname %>! 👋</h2>
+            <p>Chúc bạn có một ngày làm việc hiệu quả với vai trò <strong><%= rolename %></strong></p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-icon">📊</span>
+                <div class="stat-number">100+</div>
+                <div class="stat-label">Người dùng hoạt động</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📁</span>
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Danh mục được tạo</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">⚡</span>
+                <div class="stat-number">99.9%</div>
+                <div class="stat-label">Thời gian hoạt động</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🔒</span>
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Bảo mật dữ liệu</div>
             </div>
         </div>
 
-        <!-- User Information Card -->
-        <div class="card">
-            <h2>Thông Tin Người Dùng</h2>
-            
-            <div class="info-row">
-                <span class="info-label">Tên đăng nhập:</span>
-                <span class="info-value"><%= username %></span>
+        <!-- Features -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">📁</span>
+                <div class="feature-title">Quản Lý Danh Mục</div>
+                <div class="feature-description">
+                    Tạo, chỉnh sửa và quản lý các danh mục của bạn một cách dễ dàng và hiệu quả.
+                </div>
+                <a href="category" class="feature-btn">Truy cập ngay</a>
             </div>
             
-            <div class="info-row">
-                <span class="info-label">Email:</span>
-                <span class="info-value"><%= email %></span>
+            <div class="feature-card">
+                <span class="feature-icon">👤</span>
+                <div class="feature-title">Hồ Sơ Cá Nhân</div>
+                <div class="feature-description">
+                    Xem và cập nhật thông tin cá nhân, quản lý tài khoản của bạn.
+                </div>
+                <a href="profile.jsp" class="feature-btn">Xem hồ sơ</a>
             </div>
             
-            <div class="info-row">
-                <span class="info-label">Họ và tên:</span>
-                <span class="info-value"><%= fullname %></span>
+            <div class="feature-card">
+                <span class="feature-icon">🔐</span>
+                <div class="feature-title">Bảo Mật Cao</div>
+                <div class="feature-description">
+                    Hệ thống được bảo vệ với các cơ chế bảo mật hiện đại và mã hóa dữ liệu.
+                </div>
+                <a href="forgot-password" class="feature-btn">Đổi mật khẩu</a>
             </div>
-            
-            <div class="info-row">
-                <span class="info-label">Vai trò:</span>
-                <span class="role-badge <%= roleid == 1 ? "admin" : (roleid == 2 ? "manager" : "member") %>">
-                    <%= rolename %>
-                </span>
-            </div>
-
-            <!-- Session Information -->
-            <div class="session-info">
-                <h3>Thông Tin Phiên Làm Việc</h3>
-                <p><strong>Thời gian đăng nhập:</strong> <script>document.write(new Date().toLocaleString('vi-VN'));</script></p>
-                <p><strong>ID Phiên:</strong> <%= session.getId() %></p>
-                <p><strong>Trạng thái:</strong> Đang hoạt động</p>
-            </div>
-        </div>
-
-        <!-- System Status -->
-        <div class="card">
-            <h2>Trạng Thái Hệ Thống</h2>
-            <p>Đăng nhập thành công vào hệ thống quản lý.</p>
-            <p><strong>Role của bạn:</strong> <%= rolename %></p>
-            
-            <%
-                if (roleid == 1) {
-                    out.println("<p>Bạn có quyền quản trị toàn bộ hệ thống.</p>");
-                } else if (roleid == 2) {
-                    out.println("<p>Bạn có quyền quản lý các hoạt động cấp trung.</p>");
-                } else {
-                    out.println("<p>Bạn có quyền truy cập các chức năng cơ bản.</p>");
-                }
-            %>
         </div>
 
         <!-- Quick Actions -->
-        <div class="card">
-            <h2>Thao Tác Nhanh</h2>
-            <div class="quick-actions">
-                <a href="profile" class="action-btn">
-                    <span class="action-icon">👤</span>
-                    <span class="action-text">Hồ sơ</span>
+        <div class="quick-actions">
+            <h3>Thao Tác Nhanh</h3>
+            <div class="actions-grid">
+                <a href="category?action=add" class="action-btn">
+                    <span class="action-icon">➕</span>
+                    <span class="action-text">Tạo Danh Mục</span>
                 </a>
-                <a href="settings" class="action-btn">
+                <a href="category" class="action-btn">
+                    <span class="action-icon">📋</span>
+                    <span class="action-text">Xem Danh Sách</span>
+                </a>
+                <a href="profile.jsp" class="action-btn">
                     <span class="action-icon">⚙️</span>
-                    <span class="action-text">Cài đặt</span>
+                    <span class="action-text">Cài Đặt</span>
                 </a>
-                <a href="help" class="action-btn">
-                    <span class="action-icon">❓</span>
-                    <span class="action-text">Trợ giúp</span>
-                </a>
-                <a href="logout" class="action-btn">
+                <a href="logout" class="action-btn" onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
                     <span class="action-icon">🚪</span>
-                    <span class="action-text">Đăng xuất</span>
+                    <span class="action-text">Đăng Xuất</span>
                 </a>
             </div>
         </div>
     </div>
 
     <script>
-        // Add logout confirmation
+        // Add smooth scroll and animations
         document.addEventListener('DOMContentLoaded', function() {
-            const logoutBtn = document.querySelector('.logout-btn');
-            logoutBtn.addEventListener('click', function(e) {
-                if (!confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
-                    e.preventDefault();
-                }
+            // Animate cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards
+            document.querySelectorAll('.stat-card, .feature-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
             });
+
+            // Add loading animation
+            setTimeout(() => {
+                document.querySelectorAll('.stat-card, .feature-card').forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 500);
         });
     </script>
 </body>

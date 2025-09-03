@@ -54,9 +54,13 @@ $TOMCAT_HOME/bin/startup.sh
 ```
 
 ### Bước 4: Truy cập ứng dụng
-- **Trang chủ**: http://localhost:8080/
-- **Đăng nhập**: http://localhost:8080/login
-- **Đăng ký**: http://localhost:8080/register
+- Lưu ý: WAR deploy mặc định tên `login_demo_war` → base URL: `http://localhost:8080/login_demo_war/`
+- **Trang đăng nhập (welcome)**: `http://localhost:8080/login_demo_war/login`
+- **Trang chủ**: `http://localhost:8080/login_demo_war/home`
+- **Danh mục**: `http://localhost:8080/login_demo_war/category`
+- **Hồ sơ**: `http://localhost:8080/login_demo_war/profile.jsp`
+- **Quên mật khẩu**: `http://localhost:8080/login_demo_war/forgot-password`
+- **Đăng ký**: `http://localhost:8080/login_demo_war/register`
 
 ## Tài khoản test
 - **Admin**: admin / admin123
@@ -74,20 +78,32 @@ src/
 │   │       │   └── ApplicationContextListener.java
 │   │       ├── controller/
 │   │       │   ├── LoginServlet.java
-│   │       │   └── RegisterServlet.java
+│   │       │   ├── RegisterServlet.java
+│   │       │   ├── LogoutServlet.java
+│   │       │   ├── ForgotPasswordServlet.java
+│   │       │   ├── CategoryServlet.java
+│   │       │   └── HomeServlet.java
 │   │       ├── dao/
-│   │       │   └── UserDAO.java
+│   │       │   ├── UserDAO.java
+│   │       │   └── CategoryDAO.java
 │   │       ├── model/
-│   │       │   └── User.java
+│   │       │   ├── User.java
+│   │       │   └── Category.java
 │   │       └── service/
-│   │           └── UserService.java
+│   │           ├── UserService.java
+│   │           └── CategoryService.java
 │   └── webapp/
 │       ├── WEB-INF/
 │       │   ├── web.xml
 │       │   └── lib/
-│       ├── index.jsp
-│       ├── login.jsp
-│       └── register.jsp
+│       ├── index.jsp          # Trang chủ mới (Dashboard)
+│       ├── login.jsp          # Trang đăng nhập
+│       ├── register.jsp       # Trang đăng ký
+│       ├── profile.jsp        # Trang hồ sơ
+│       ├── category.jsp       # Trang danh sách danh mục (category-list.jsp)
+│       ├── category-form.jsp  # Form thêm/sửa danh mục
+│       ├── forgot-password.jsp
+│       └── test-urls.jsp      # Trang kiểm tra các URL
 ```
 
 ## Tác giả

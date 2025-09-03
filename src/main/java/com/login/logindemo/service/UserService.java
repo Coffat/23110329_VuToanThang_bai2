@@ -165,4 +165,107 @@ public class UserService {
             return false;
         }
     }
+    
+    /**
+     * Reset password by email
+     * @param email User email
+     * @param newPassword New password
+     * @param confirmPassword Confirm new password
+     * @return true if reset successful, false otherwise
+     */
+    public boolean resetPassword(String email, String newPassword, String confirmPassword) {
+        try {
+            // Validate input
+            if (email == null || email.trim().isEmpty()) {
+                System.out.println("Email cannot be empty");
+                return false;
+            }
+            
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                System.out.println("New password cannot be empty");
+                return false;
+            }
+            
+            if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+                System.out.println("Confirm password cannot be empty");
+                return false;
+            }
+            
+            if (!newPassword.equals(confirmPassword)) {
+                System.out.println("Passwords do not match");
+                return false;
+            }
+            
+            if (newPassword.length() < 6) {
+                System.out.println("Password must be at least 6 characters");
+                return false;
+            }
+            
+            // Check if email exists
+            User user = userDAO.findByEmail(email.trim());
+            if (user == null) {
+                System.out.println("Email not found: " + email);
+                return false;
+            }
+            
+            // Update password
+            boolean success = userDAO.updatePasswordByEmail(email.trim(), newPassword);
+            
+            if (success) {
+                System.out.println("Password reset successful for email: " + email);
+                return true;
+            } else {
+                System.out.println("Password reset failed for email: " + email);
+                return false;
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error during password reset: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Validate password reset input
+     * @param email Email
+     * @param newPassword New password
+     * @param confirmPassword Confirm password
+     * @return Error message if validation fails, null if validation passes
+     */
+    public String validatePasswordResetInput(String email, String newPassword, String confirmPassword) {
+        if (email == null || email.trim().isEmpty()) {
+            return "Email không được để trống";
+        }
+        
+        if (!isValidEmail(email)) {
+            return "Email không hợp lệ";
+        }
+        
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            return "Mật khẩu mới không được để trống";
+        }
+        
+        if (newPassword.length() < 6) {
+            return "Mật khẩu phải có ít nhất 6 ký tự";
+        }
+        
+        if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+            return "Vui lòng xác nhận mật khẩu mới";
+        }
+        
+        if (!newPassword.equals(confirmPassword)) {
+            return "Mật khẩu xác nhận không khớp";
+        }
+        
+        return null; // No validation errors
+    }
+    
+    /**
+     * Validate email format
+     */
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        return email.matches(emailRegex);
+    }
 }

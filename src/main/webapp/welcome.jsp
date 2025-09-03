@@ -27,10 +27,11 @@
     <title>Trang Chủ - Hệ Thống Quản Lý</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
             padding: 20px;
+            min-height: 100vh;
         }
 
         .container {
@@ -39,9 +40,10 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border: none;
-            border-radius: 10px;
+            border-radius: 20px;
             padding: 25px;
             margin-bottom: 25px;
             display: flex;
@@ -51,7 +53,7 @@
         }
 
         .header h1 {
-            color: white;
+            color: #333;
             margin: 0;
             font-size: 28px;
             font-weight: 600;
@@ -63,11 +65,11 @@
         }
 
         .nav-btn {
-            background-color: rgba(255,255,255,0.2);
+            background-color: #667eea;
             color: white;
             padding: 8px 16px;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
+            border: none;
+            border-radius: 20px;
             text-decoration: none;
             font-size: 14px;
             transition: all 0.3s ease;
@@ -95,9 +97,9 @@
         }
 
         .card {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
         }
@@ -199,9 +201,9 @@
         }
 
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             border: none;
-            border-radius: 10px;
+            border-radius: 20px;
             padding: 25px;
             margin-bottom: 25px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -220,9 +222,10 @@
         <div class="header">
             <h1>Chào mừng, <%= fullname %>!</h1>
             <div class="header-actions">
-                <a href="dashboard" class="nav-btn">Dashboard</a>
-                <a href="profile" class="nav-btn">Hồ sơ</a>
-                <a href="logout" class="logout-btn">Đăng Xuất</a>
+                <a href="home" class="nav-btn">Trang chủ</a>
+                <a href="category" class="nav-btn">Danh mục</a>
+                <a href="profile.jsp" class="nav-btn">Hồ sơ</a>
+                <a href="logout" class="logout-btn" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">Đăng Xuất</a>
             </div>
         </div>
 
@@ -282,21 +285,21 @@
         <div class="card">
             <h2>Thao Tác Nhanh</h2>
             <div class="quick-actions">
-                <a href="dashboard" class="action-btn">
-                    <span class="action-icon">📊</span>
-                    <span class="action-text">Dashboard</span>
+                <a href="category?action=add" class="action-btn">
+                    <span class="action-icon">➕</span>
+                    <span class="action-text">Tạo danh mục</span>
                 </a>
-                <a href="profile" class="action-btn">
+                <a href="category" class="action-btn">
+                    <span class="action-icon">📁</span>
+                    <span class="action-text">Quản lý danh mục</span>
+                </a>
+                <a href="profile.jsp" class="action-btn">
                     <span class="action-icon">👤</span>
-                    <span class="action-text">Hồ sơ</span>
+                    <span class="action-text">Hồ sơ cá nhân</span>
                 </a>
-                <a href="settings" class="action-btn">
-                    <span class="action-icon">⚙️</span>
-                    <span class="action-text">Cài đặt</span>
-                </a>
-                <a href="help" class="action-btn">
-                    <span class="action-icon">❓</span>
-                    <span class="action-text">Trợ giúp</span>
+                <a href="forgot-password" class="action-btn">
+                    <span class="action-icon">🔐</span>
+                    <span class="action-text">Đổi mật khẩu</span>
                 </a>
             </div>
         </div>

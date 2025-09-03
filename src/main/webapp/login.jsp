@@ -7,20 +7,25 @@
     <title>Đăng Nhập - Hệ Thống Quản Lý</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
-            padding: 50px;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .login-container {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
             padding: 30px;
-            max-width: 400px;
-            margin: 0 auto;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+            margin: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
 
         .login-header {
@@ -46,15 +51,17 @@
 
         .form-group input {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
             font-size: 14px;
+            background: #fff;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #007bff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
         }
 
         .checkbox-group {
@@ -67,17 +74,19 @@
 
         .login-btn {
             width: 100%;
-            padding: 10px;
-            background-color: #007bff;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
         }
 
         .login-btn:hover {
-            background-color: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
         .alert {
@@ -180,6 +189,10 @@
 
             <button type="submit" class="login-btn">Đăng Nhập</button>
         </form>
+        
+        <div class="forgot-password-link" style="text-align: center; margin-top: 15px;">
+            <a href="forgot-password" style="color: #007bff; text-decoration: none; font-size: 14px;">Quên mật khẩu?</a>
+        </div>
 
         <!-- Test Accounts Section -->
         <div class="test-accounts">
@@ -199,7 +212,7 @@
         </div>
 
         <div class="register-link" style="text-align: center; margin-top: 20px;">
-            <p>Chưa có tài khoản? <a href="register.jsp" style="color: #007bff; text-decoration: none;">Đăng ký ngay</a></p>
+            <p>Chưa có tài khoản? <a href="register" style="color: #007bff; text-decoration: none;">Đăng ký ngay</a></p>
         </div>
     </div>
 
