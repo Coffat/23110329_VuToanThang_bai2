@@ -81,6 +81,45 @@ public class UserDAO {
     }
     
     /**
+     * Update basic profile fields
+     */
+    public boolean updateProfile(int userId, String fullname, String phone, String avatarPathOrNull) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        boolean hasAvatar = avatarPathOrNull != null && !avatarPathOrNull.isBlank();
+        String sql = hasAvatar
+                ? "UPDATE [User] SET fullname = ?, phone = ?, avatar = ? WHERE id = ?"
+                : "UPDATE [User] SET fullname = ?, phone = ? WHERE id = ?";
+
+        try {
+            conn = DBConnection.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, fullname);
+            pstmt.setString(2, phone);
+            if (hasAvatar) {
+                pstmt.setString(3, avatarPathOrNull);
+                pstmt.setInt(4, userId);
+            } else {
+                pstmt.setInt(3, userId);
+            }
+
+            int rows = pstmt.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating profile: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+                if (conn != null) DBConnection.returnConnection(conn);
+            } catch (SQLException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
      * Find user by username
      * @param username Username to search for
      * @return User object if found, null otherwise

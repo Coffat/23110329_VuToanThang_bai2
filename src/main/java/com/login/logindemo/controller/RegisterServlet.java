@@ -34,7 +34,7 @@ public class RegisterServlet extends HttpServlet {
         
         // Check if user is already logged in
         if (request.getSession(false) != null && request.getSession().getAttribute("user") != null) {
-            response.sendRedirect(request.getContextPath() + "/home");
+            response.sendRedirect(request.getContextPath() + "/");
             return;
         }
         

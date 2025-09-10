@@ -72,7 +72,7 @@ public class LoginServlet extends HttpServlet {
                     // Check if user is already logged in
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
-            response.sendRedirect(request.getContextPath() + "/home");
+            response.sendRedirect(request.getContextPath() + "/");
             return;
         }
             
@@ -143,7 +143,7 @@ public class LoginServlet extends HttpServlet {
                              " at " + new java.util.Date());
             
             // Redirect to home page
-            response.sendRedirect(request.getContextPath() + "/home");
+            response.sendRedirect(request.getContextPath() + "/");
             
         } else {
             // Login failed

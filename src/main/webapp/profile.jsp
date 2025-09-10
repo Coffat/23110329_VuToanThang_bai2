@@ -27,566 +27,602 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hồ Sơ Cá Nhân - Hệ Thống Quản Lý</title>
+    
+    <!-- Include Header -->
+    <jsp:include page="components/header.jsp" />
+    
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: #333;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .container {
+        .profile-container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 40px 20px;
         }
 
-        .page-header {
-            text-align: center;
+        .profile-header {
+            background: var(--primary-gradient);
             color: white;
-            margin-bottom: 40px;
-        }
-
-        .page-header h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .page-header p {
-            font-size: 18px;
-            opacity: 0.9;
-        }
-
-        .profile-container {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .profile-sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
             text-align: center;
-            height: fit-content;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><path d="M0,50 Q250,0 500,50 T1000,50 L1000,100 L0,100 Z"/></svg>');
+            background-size: cover;
         }
 
         .profile-avatar {
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 4px solid rgba(255, 255, 255, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 48px;
+            font-size: 3rem;
             font-weight: bold;
-            margin: 0 auto 20px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            margin: 0 auto 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
         }
 
         .profile-role {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 20px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
         }
 
-        .role-badge {
-            display: inline-block;
-            background-color: #007bff;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .role-badge.admin {
-            background-color: #dc3545;
-        }
-
-        .role-badge.manager {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .profile-stats {
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .stat-value {
-            color: #333;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .profile-main {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .info-card {
+            background: white;
+            border: none;
             border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
         }
 
-        .profile-section {
-            margin-bottom: 40px;
+        .info-card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
         }
 
-        .section-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
+        .info-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0;
+            color: #495057;
         }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+        .info-card-body {
+            padding: 2rem;
         }
 
         .info-item {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .info-content {
+            flex: 1;
         }
 
         .info-label {
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.25rem;
         }
 
         .info-value {
-            color: #666;
-            font-size: 16px;
-            word-break: break-word;
-        }
-
-        .session-info {
-            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 20px;
-        }
-
-        .session-info h3 {
-            margin-top: 0;
-            color: #1976d2;
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .session-detail {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(25, 118, 210, 0.1);
-        }
-
-        .session-detail:last-child {
-            border-bottom: none;
+            color: #6c757d;
             margin-bottom: 0;
         }
 
-        .session-label {
-            font-weight: 600;
-            color: #1976d2;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .session-value {
-            color: #424242;
-            font-family: monospace;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 4px 8px;
-            border-radius: 4px;
+        .stat-item {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-weight: 500;
         }
 
         .action-buttons {
             display: flex;
-            gap: 15px;
+            gap: 1rem;
+            flex-wrap: wrap;
             justify-content: center;
-            margin-top: 30px;
         }
 
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            text-decoration: none;
+        .security-section {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .security-title {
+            color: #856404;
             font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 1rem;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .security-info {
+            color: #664d03;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb-custom {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .breadcrumb-custom .breadcrumb {
+            margin-bottom: 0;
+            background: transparent;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .role-admin {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        .role-manager {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
         }
 
-        .btn-secondary {
-            background: #6c757d;
+        .role-user {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
             color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #545b62;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .permissions-list {
-            margin-top: 20px;
-        }
-
-        .permission-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .permission-item:last-child {
-            border-bottom: none;
-        }
-
-        .permission-icon {
-            color: #28a745;
-            font-size: 16px;
-        }
-
-        .permission-text {
-            color: #333;
-            font-size: 14px;
         }
 
         @media (max-width: 768px) {
-            .profile-container {
-                grid-template-columns: 1fr;
+            .profile-header {
+                padding: 1.5rem;
             }
             
-            .nav-links {
-                display: none;
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
             }
             
-            .container {
-                padding: 20px 15px;
+            .profile-name {
+                font-size: 1.5rem;
             }
             
-            .info-grid {
-                grid-template-columns: 1fr;
+            .info-card-body {
+                padding: 1.5rem;
             }
             
             .action-buttons {
                 flex-direction: column;
-                align-items: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="home" class="logo">🏠 Hệ Thống Quản Lý</a>
-            <div class="nav-links">
-                <a href="home" class="nav-link">Trang Chủ</a>
-                <a href="category" class="nav-link">Danh Mục</a>
-                <a href="profile.jsp" class="nav-link active">Hồ Sơ</a>
-            </div>
-            <div class="user-info">
-                <span>Xin chào, <strong><%= fullname %></strong></span>
-                <a href="logout" class="nav-link" onclick="return confirm('Bạn có chắc muốn đăng xuất?')">Đăng xuất</a>
-            </div>
-        </div>
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb-custom">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="<%= request.getContextPath() %>/" class="text-decoration-none">
+                        <i class="fas fa-home me-1"></i>Trang chủ
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <i class="fas fa-user me-1"></i>Hồ sơ cá nhân
+                </li>
+            </ol>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1>Hồ Sơ Cá Nhân</h1>
-            <p>Quản lý thông tin tài khoản và cài đặt cá nhân</p>
-        </div>
-
-        <!-- Profile Container -->
         <div class="profile-container">
-            <!-- Sidebar -->
-            <div class="profile-sidebar">
+            <!-- Profile Header -->
+            <div class="profile-header">
                 <div class="profile-avatar">
                     <%= fullname.substring(0, 1).toUpperCase() %>
                 </div>
                 <div class="profile-name"><%= fullname %></div>
-                <div class="profile-role">@<%= username %></div>
-                <div class="role-badge <%= roleid == 1 ? "admin" : (roleid == 2 ? "manager" : "member") %>">
+                <div class="profile-role">
                     <%= rolename %>
+                    <div class="role-badge role-<%= rolename.toLowerCase() %>">
+                        <i class="fas fa-<%= roleid == 1 ? "crown" : roleid == 2 ? "user-tie" : "user" %> me-1"></i>
+                        <%= rolename %>
+                    </div>
+                </div>
                 </div>
                 
-                <div class="profile-stats">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
                     <div class="stat-item">
-                        <span class="stat-label">Trạng thái:</span>
-                        <span class="stat-value">🟢 Hoạt động</span>
+                    <i class="fas fa-calendar-alt stat-icon"></i>
+                    <div class="stat-number">
+                        <%= java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd")) %>
+                    </div>
+                    <div class="stat-label">Ngày hôm nay</div>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Lần đăng nhập:</span>
-                        <span class="stat-value">Hôm nay</span>
+                    <i class="fas fa-clock stat-icon"></i>
+                    <div class="stat-number" id="currentTime">--:--</div>
+                    <div class="stat-label">Giờ hiện tại</div>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Quyền hạn:</span>
-                        <span class="stat-value">
-                            <%= roleid == 1 ? "Toàn quyền" : (roleid == 2 ? "Quản lý" : "Cơ bản") %>
-                        </span>
+                    <i class="fas fa-user-check stat-icon"></i>
+                    <div class="stat-number">Online</div>
+                    <div class="stat-label">Trạng thái</div>
                     </div>
+                <div class="stat-item">
+                    <i class="fas fa-shield-alt stat-icon"></i>
+                    <div class="stat-number">Bảo mật</div>
+                    <div class="stat-label">Tài khoản</div>
                 </div>
             </div>
 
-            <!-- Main Profile Content -->
-            <div class="profile-main">
                 <!-- Personal Information -->
-                <div class="profile-section">
-                    <h2 class="section-title">Thông Tin Cá Nhân</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Tên đăng nhập</div>
-                            <div class="info-value"><%= username %></div>
+            <div class="info-card">
+                <div class="info-card-header">
+                    <h5 class="info-card-title">
+                        <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                    </h5>
+                </div>
+                <div class="info-card-body">
+                    <form action="<%= request.getContextPath() %>/profile" method="post" enctype="multipart/form-data" class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Họ và tên</label>
+                            <input type="text" name="fullname" class="form-control" value="<%= fullname %>" required>
                         </div>
-                        <div class="info-item">
-                            <div class="info-label">Họ và tên</div>
-                            <div class="info-value"><%= fullname %></div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tên đăng nhập</label>
+                            <input type="text" class="form-control" value="<%= username %>" disabled>
                         </div>
-                        <div class="info-item">
-                            <div class="info-label">Email</div>
-                            <div class="info-value"><%= email %></div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" value="<%= email %>" disabled>
                         </div>
-                        <div class="info-item">
-                            <div class="info-label">Số điện thoại</div>
-                            <div class="info-value"><%= phone %></div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input type="text" name="phone" class="form-control" value="<%= phone %>">
                         </div>
-                        <div class="info-item">
-                            <div class="info-label">Vai trò</div>
-                            <div class="info-value"><%= rolename %></div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Ảnh đại diện</label>
+                            <input type="file" name="avatar" accept="image/*" class="form-control">
                         </div>
-                        <div class="info-item">
-                            <div class="info-label">ID Người dùng</div>
-                            <div class="info-value">#<%= session.getAttribute("userId") != null ? session.getAttribute("userId") : "N/A" %></div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                         </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Section -->
+            <div class="security-section">
+                <h6 class="security-title">
+                    <i class="fas fa-shield-alt me-2"></i>Bảo mật tài khoản
+                </h6>
+                <p class="security-info">
+                    Để đảm bảo an toàn cho tài khoản của bạn, hãy thường xuyên thay đổi mật khẩu và 
+                    không chia sẻ thông tin đăng nhập với người khác.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="<%= request.getContextPath() %>/forgot-password" class="btn btn-gradient-warning">
+                        <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                    </a>
+                    <button type="button" class="btn btn-outline-info" onclick="showSecurityTips()">
+                        <i class="fas fa-info-circle me-2"></i>Mẹo bảo mật
+                    </button>
                     </div>
                 </div>
 
-                <!-- Permissions -->
-                <div class="profile-section">
-                    <h2 class="section-title">Quyền Hạn</h2>
-                    <div class="permissions-list">
-                        <div class="permission-item">
-                            <span class="permission-icon">✅</span>
-                            <span class="permission-text">Xem và chỉnh sửa hồ sơ cá nhân</span>
+            <!-- System Information -->
+            <div class="info-card">
+                <div class="info-card-header">
+                    <h5 class="info-card-title">
+                        <i class="fas fa-cog me-2"></i>Thông tin hệ thống
+                    </h5>
+                </div>
+                <div class="info-card-body">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-calendar-plus"></i>
                         </div>
-                        <div class="permission-item">
-                            <span class="permission-icon">✅</span>
-                            <span class="permission-text">Quản lý danh mục cá nhân</span>
+                        <div class="info-content">
+                            <div class="info-label">Ngày tạo tài khoản</div>
+                            <div class="info-value">Không có dữ liệu</div>
                         </div>
-                        <div class="permission-item">
-                            <span class="permission-icon">✅</span>
-                            <span class="permission-text">Đổi mật khẩu</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-sign-in-alt"></i>
                         </div>
-                        <% if (roleid == 1) { %>
-                        <div class="permission-item">
-                            <span class="permission-icon">✅</span>
-                            <span class="permission-text">Quản trị toàn bộ hệ thống</span>
+                        <div class="info-content">
+                            <div class="info-label">Lần đăng nhập cuối</div>
+                            <div class="info-value" id="lastLogin">Phiên hiện tại</div>
                         </div>
-                        <div class="permission-item">
-                            <span class="permission-icon">✅</span>
-                            <span class="permission-text">Xem tất cả danh mục</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-globe"></i>
                         </div>
-                        <% } else if (roleid == 2) { %>
-                        <div class="permission-item">
-                            <span class="permission-icon">✅</span>
-                            <span class="permission-text">Quản lý hoạt động cấp trung</span>
-                        </div>
-                        <% } %>
+                        <div class="info-content">
+                            <div class="info-label">Địa chỉ IP</div>
+                            <div class="info-value"><%= request.getRemoteAddr() %></div>
                     </div>
                 </div>
 
-                <!-- Session Information -->
-                <div class="session-info">
-                    <h3>Thông Tin Phiên Làm Việc</h3>
-                    <div class="session-detail">
-                        <span class="session-label">Thời gian đăng nhập:</span>
-                        <span class="session-value" id="loginTime"></span>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-desktop"></i>
                     </div>
-                    <div class="session-detail">
-                        <span class="session-label">ID Phiên:</span>
-                        <span class="session-value"><%= session.getId() %></span>
-                    </div>
-                    <div class="session-detail">
-                        <span class="session-label">Trạng thái:</span>
-                        <span class="session-value">🟢 Đang hoạt động</span>
-                    </div>
-                    <div class="session-detail">
-                        <span class="session-label">Thời gian hoạt động:</span>
-                        <span class="session-value" id="sessionDuration"></span>
+                        <div class="info-content">
+                            <div class="info-label">Trình duyệt</div>
+                            <div class="info-value" id="userAgent">Đang tải...</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Action Buttons -->
+            <div class="text-center">
         <div class="action-buttons">
-            <a href="home" class="btn btn-secondary">
-                🏠 Về trang chủ
-            </a>
-            <a href="forgot-password" class="btn btn-primary">
-                🔐 Đổi mật khẩu
-            </a>
-            <a href="logout" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
-                🚪 Đăng xuất
-            </a>
+                    <a href="<%= request.getContextPath() %>/" class="btn btn-gradient-primary btn-lg">
+                        <i class="fas fa-home me-2"></i>Về trang chủ
+                    </a>
+                    <a href="<%= request.getContextPath() %>/category" class="btn btn-gradient-secondary btn-lg">
+                        <i class="fas fa-folder me-2"></i>Quản lý danh mục
+                    </a>
+                    <a href="<%= request.getContextPath() %>/logout" 
+                       class="btn btn-outline-danger btn-lg"
+                       onclick="return confirm('Bạn có chắc muốn đăng xuất?')">
+                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Footer -->
+    <jsp:include page="components/footer.jsp" />
+
+    <!-- Security Tips Modal -->
+    <div class="modal fade" id="securityTipsModal" tabindex="-1" aria-labelledby="securityTipsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="securityTipsModalLabel">
+                        <i class="fas fa-shield-alt me-2"></i>Mẹo bảo mật tài khoản
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-key text-primary me-2"></i>Mật khẩu mạnh</h6>
+                            <ul class="list-unstyled ps-3">
+                                <li>• Ít nhất 8 ký tự</li>
+                                <li>• Kết hợp chữ hoa, chữ thường</li>
+                                <li>• Có số và ký tự đặc biệt</li>
+                                <li>• Không sử dụng thông tin cá nhân</li>
+                            </ul>
+                            
+                            <h6><i class="fas fa-user-secret text-warning me-2"></i>Bảo vệ thông tin</h6>
+                            <ul class="list-unstyled ps-3">
+                                <li>• Không chia sẻ mật khẩu</li>
+                                <li>• Đăng xuất khi không sử dụng</li>
+                                <li>• Không lưu mật khẩu trên máy chung</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-wifi text-success me-2"></i>An toàn mạng</h6>
+                            <ul class="list-unstyled ps-3">
+                                <li>• Tránh WiFi công cộng</li>
+                                <li>• Kiểm tra URL trước khi đăng nhập</li>
+                                <li>• Cập nhật trình duyệt thường xuyên</li>
+                            </ul>
+                            
+                            <h6><i class="fas fa-bell text-info me-2"></i>Phát hiện bất thường</h6>
+                            <ul class="list-unstyled ps-3">
+                                <li>• Theo dõi hoạt động đăng nhập</li>
+                                <li>• Báo cáo nếu có dấu hiệu lạ</li>
+                                <li>• Thay đổi mật khẩu định kỳ</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <a href="<%= request.getContextPath() %>/forgot-password" class="btn btn-gradient-primary">
+                        Đổi mật khẩu ngay
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Set login time and session duration
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set current time as login time
+        // Update current time
+        function updateTime() {
             const now = new Date();
-            document.getElementById('loginTime').textContent = now.toLocaleString('vi-VN');
-            
-            // Calculate session duration (simple example)
-            const sessionStart = now;
-            
-            function updateSessionDuration() {
-                const now = new Date();
-                const duration = Math.floor((now - sessionStart) / 1000); // seconds
-                const minutes = Math.floor(duration / 60);
-                const seconds = duration % 60;
-                document.getElementById('sessionDuration').textContent = 
-                    `${minutes} phút ${seconds} giây`;
-            }
-            
-            // Update every second
-            updateSessionDuration();
-            setInterval(updateSessionDuration, 1000);
+            const timeString = now.toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
 
-            // Add smooth animations
-            const cards = document.querySelectorAll('.info-item');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'all 0.3s ease';
+        // Update time every second
+        setInterval(updateTime, 1000);
+        updateTime(); // Initial call
+
+        // Display user agent
+        document.getElementById('userAgent').textContent = navigator.userAgent.split(' ')[0] || 'Không xác định';
+
+        // Show security tips modal
+        function showSecurityTips() {
+            const modal = new bootstrap.Modal(document.getElementById('securityTipsModal'));
+            modal.show();
+        }
+
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stat items
+            const statItems = document.querySelectorAll('.stat-item');
+            statItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'all 0.6s ease';
                 
                 setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 150);
             });
+
+            // Add click effect to info items
+            document.querySelectorAll('.info-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+
+            // Display last login time (simulated)
+            const lastLoginTime = new Date();
+            lastLoginTime.setMinutes(lastLoginTime.getMinutes() - 30);
+            document.getElementById('lastLogin').textContent = 
+                lastLoginTime.toLocaleString('vi-VN');
+        });
+
+        // Copy user info to clipboard
+        function copyUserInfo() {
+            const userInfo = `
+Họ tên: <%= fullname %>
+Username: <%= username %>
+Email: <%= email %>
+Phone: <%= phone %>
+Role: <%= rolename %>
+            `.trim();
+            
+            navigator.clipboard.writeText(userInfo).then(() => {
+                // Show success toast
+                const toast = document.createElement('div');
+                toast.className = 'toast show position-fixed bottom-0 end-0 m-3';
+                toast.innerHTML = `
+                    <div class="toast-header">
+                        <i class="fas fa-copy text-primary me-2"></i>
+                        <strong class="me-auto">Đã sao chép</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        Thông tin người dùng đã được sao chép vào clipboard.
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            });
+        }
+
+        // Add copy button to personal info card
+        document.addEventListener('DOMContentLoaded', function() {
+            const personalInfoHeader = document.querySelector('.info-card-header h5');
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'btn btn-sm btn-outline-secondary ms-2';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyBtn.title = 'Sao chép thông tin';
+            copyBtn.onclick = copyUserInfo;
+            personalInfoHeader.appendChild(copyBtn);
         });
     </script>
 </body>

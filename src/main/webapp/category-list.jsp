@@ -3,101 +3,9 @@
 <%@ page import="com.login.logindemo.model.Category" %>
 <%@ page import="com.login.logindemo.model.User" %>
 <%
-    if (session.getAttribute("user") == null) {
-        response.sendRedirect("login");
-        return;
-    }
-    @SuppressWarnings("unchecked")
-    List<Category> categories = (List<Category>) request.getAttribute("categories");
-    User currentUser = (User) request.getAttribute("currentUser");
-    String error = (String) request.getAttribute("error");
-    String success = (String) request.getAttribute("success");
-    String searchKeyword = (String) request.getAttribute("searchKeyword");
-    if (categories == null) categories = new java.util.ArrayList<>();
-    if (searchKeyword == null) searchKeyword = "";
-%>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Danh mục</title>
-</head>
-<body>
-    <h1>Danh mục</h1>
-    <p>
-        <a href="home">Trang chủ</a> |
-        <a href="profile.jsp">Hồ sơ</a> |
-        <a href="category?action=add">Thêm danh mục</a>
-        <% if (currentUser != null && currentUser.getRoleid() == 1) { %>
-            | <a href="category?view=all">Xem tất cả</a>
-            | <a href="category?view=mine">Danh mục của tôi</a>
-        <% } %>
-    </p>
-
-    <% if (error != null && !error.isEmpty()) { %>
-        <p><%= error %></p>
-    <% } %>
-    <% if (success != null && !success.isEmpty()) { %>
-        <p><%= success %></p>
-    <% } %>
-
-    <form action="category" method="get">
-        <input type="hidden" name="action" value="search">
-        <input type="text" name="keyword" value="<%= searchKeyword %>" placeholder="Từ khóa">
-        <button type="submit">Tìm</button>
-        <% if (!searchKeyword.isEmpty()) { %>
-            <a href="category">Xóa lọc</a>
-        <% } %>
-    </form>
-
-    <% if (categories.isEmpty()) { %>
-        <p>Không có danh mục nào.</p>
-    <% } else { %>
-        <table border="1" cellpadding="6" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tên</th>
-                    <th>Mô tả</th>
-                    <th>Người tạo</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày tạo</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% for (Category c : categories) { %>
-                <tr>
-                    <td><%= c.getId() %></td>
-                    <td><%= c.getName() %></td>
-                    <td><%= c.getDescription() == null ? "" : c.getDescription() %></td>
-                    <td><%= c.getUserFullname() %></td>
-                    <td><%= c.isStatus() ? "Hoạt động" : "Ngừng" %></td>
-                    <td><%= c.getCreatedDate() != null ? c.getCreatedDate().toLocalDate() : "" %></td>
-                    <td>
-                        <a href="category?action=edit&id=<%= c.getId() %>">Sửa</a>
-                        |
-                        <a href="category?action=toggle&id=<%= c.getId() %>" onclick="return confirm('Đổi trạng thái?')">
-                            <%= c.isStatus() ? "Tắt" : "Bật" %>
-                        </a>
-                        |
-                        <a href="category?action=delete&id=<%= c.getId() %>" onclick="return confirm('Xóa danh mục?')">Xóa</a>
-                    </td>
-                </tr>
-                <% } %>
-            </tbody>
-        </table>
-    <% } %>
-</body>
-</html>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.login.logindemo.model.Category" %>
-<%@ page import="com.login.logindemo.model.User" %>
-<%
     // Check if user is logged in
     if (session.getAttribute("user") == null) {
-        response.sendRedirect("login");
+        response.sendRedirect(request.getContextPath() + "/login");
         return;
     }
     
@@ -117,446 +25,428 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Danh Mục - Hệ Thống Quản Lý</title>
+    
+    <!-- Include Header -->
+    <jsp:include page="components/header.jsp" />
+    
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-
-        /* Navbar (synced with homepage) */
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: #333;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .header {
+        .page-header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .header h1 {
-            color: #333;
-            margin: 0;
-            font-size: 28px;
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .btn {
-            padding: 8px 16px;
+        .stats-section {
+            margin-bottom: 2rem;
+        }
+
+        .stat-card-small {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             border: none;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
+        .stat-card-small:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
         }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
+        .stat-icon-small {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #1e7e34;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-            color: #000;
-        }
-
-        .btn-warning:hover {
-            background-color: #e0a800;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .categories-table-container {
+            background: white;
             border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .alert {
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+        .table-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem 1.5rem;
         }
 
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .category-image-cell {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
         }
 
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .search-bar {
+        .category-placeholder {
+            width: 80px;
+            height: 80px;
+            background: #f8f9fa;
+            border-radius: 8px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .search-bar input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .table th,
-        .table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .table th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .table tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .status-active {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .status-inactive {
-            background-color: #f8d7da;
-            color: #721c24;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.5rem;
         }
 
         .action-buttons {
             display: flex;
-            gap: 5px;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-        .category-image {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
+        .btn-action {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            border: none;
+            transition: all 0.3s ease;
         }
 
-        .no-data {
+        .empty-state {
             text-align: center;
+            padding: 3rem;
             color: #6c757d;
-            font-style: italic;
-            padding: 40px;
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
+        .search-highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
         }
 
-        .stat-number {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-    </style>
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .container { padding: 20px 15px; }
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-action {
+                width: 100%;
+                margin-bottom: 0.25rem;
+            }
+
+            .category-image-cell,
+            .category-placeholder {
+                width: 60px;
+                height: 60px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation synced with homepage -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="home" class="logo">🏠 Hệ Thống Quản Lý</a>
-            <div class="nav-links">
-                <a href="home" class="nav-link">Trang Chủ</a>
-                <a href="category" class="nav-link active">Danh Mục</a>
-                <a href="profile.jsp" class="nav-link">Hồ Sơ</a>
-            </div>
-            <div class="user-info">
-                <a href="logout" class="nav-link" onclick="return confirm('Bạn có chắc muốn đăng xuất?')">Đăng xuất</a>
-            </div>
-        </div>
-    </nav>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>Quản Lý Danh Mục</h1>
-            <div class="header-actions">
-                <a href="home" class="btn btn-secondary">🏠 Trang chủ</a>
-                <a href="profile.jsp" class="btn btn-secondary">👤 Hồ sơ</a>
-                <a href="category?action=add" class="btn btn-success">+ Thêm Danh Mục</a>
-                <% if (currentUser != null && currentUser.getRoleid() == 1) { %>
-                <a href="category?view=all" class="btn btn-primary">Xem Tất Cả</a>
-                <% } %>
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number"><%= categories.size() %></div>
-                <div class="stat-label">Tổng Danh Mục</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number"><%= categories.stream().mapToInt(c -> c.isStatus() ? 1 : 0).sum() %></div>
-                <div class="stat-label">Đang Hoạt Động</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number"><%= categories.stream().mapToInt(c -> !c.isStatus() ? 1 : 0).sum() %></div>
-                <div class="stat-label">Không Hoạt Động</div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="card">
-            <!-- Messages -->
-            <% if (error != null && !error.isEmpty()) { %>
-                <div class="alert alert-error">
-                    <%= error %>
+    <div class="container mt-4">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="page-title">
+                        <i class="fas fa-folder-open me-2"></i>Quản Lý Danh Mục
+                    </h1>
+                    <p class="text-muted mb-0">Tạo, chỉnh sửa và quản lý các danh mục của bạn</p>
                 </div>
-            <% } %>
-
-            <% if (success != null && !success.isEmpty()) { %>
-                <div class="alert alert-success">
-                    <%= success %>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="<%= request.getContextPath() %>/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-1"></i>Trang chủ
+                    </a>
+                    <a href="<%= request.getContextPath() %>/category?action=add" class="btn btn-gradient-success">
+                        <i class="fas fa-plus me-1"></i>Thêm Danh Mục
+                    </a>
+                    <% if (currentUser != null && currentUser.getRoleid() == 1) { %>
+                    <div class="dropdown">
+                        <button class="btn btn-gradient-primary dropdown-toggle" type="button" 
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-filter me-1"></i>Bộ lọc
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="<%= request.getContextPath() %>/category?view=all">
+                                <i class="fas fa-globe me-2"></i>Xem tất cả
+                            </a></li>
+                            <li><a class="dropdown-item" href="<%= request.getContextPath() %>/category?view=mine">
+                                <i class="fas fa-user me-2"></i>Danh mục của tôi
+                            </a></li>
+                        </ul>
+                    </div>
+                    <% } %>
                 </div>
-            <% } %>
+            </div>
+        </div>
 
-            <!-- Search Bar -->
-            <form action="category" method="get" class="search-bar">
+        <!-- Messages -->
+        <% if (error != null && !error.isEmpty()) { %>
+            <div class="alert alert-danger alert-custom">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <%= error %>
+            </div>
+        <% } %>
+
+        <% if (success != null && !success.isEmpty()) { %>
+            <div class="alert alert-success alert-custom">
+                <i class="fas fa-check-circle me-2"></i>
+                <%= success %>
+            </div>
+        <% } %>
+
+        <!-- Statistics -->
+        <div class="stats-section">
+            <div class="row g-3">
+                <div class="col-lg-3 col-md-6">
+                    <div class="card stat-card-small">
+                        <i class="fas fa-folder stat-icon-small"></i>
+                        <div class="fw-bold fs-4"><%= categories.size() %></div>
+                        <small class="text-muted">Tổng Danh Mục</small>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card stat-card-small">
+                        <i class="fas fa-check-circle stat-icon-small"></i>
+                        <div class="fw-bold fs-4 text-success">
+                            <%= categories.stream().mapToInt(c -> c.isStatus() ? 1 : 0).sum() %>
+                        </div>
+                        <small class="text-muted">Đang Hoạt Động</small>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card stat-card-small">
+                        <i class="fas fa-times-circle stat-icon-small"></i>
+                        <div class="fw-bold fs-4 text-warning">
+                            <%= categories.stream().mapToInt(c -> !c.isStatus() ? 1 : 0).sum() %>
+                        </div>
+                        <small class="text-muted">Không Hoạt Động</small>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card stat-card-small">
+                        <i class="fas fa-user stat-icon-small"></i>
+                        <div class="fw-bold fs-4 text-info">
+                            <%= currentUser != null ? currentUser.getFullname() : "N/A" %>
+                        </div>
+                        <small class="text-muted">Người dùng hiện tại</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <form action="<%= request.getContextPath() %>/category" method="get" class="row g-3 align-items-end">
                 <input type="hidden" name="action" value="search">
-                <input type="text" name="keyword" placeholder="Tìm kiếm danh mục..." value="<%= searchKeyword %>">
-                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                <% if (!searchKeyword.isEmpty()) { %>
-                <a href="category" class="btn btn-secondary">Xóa bộ lọc</a>
-                <% } %>
+                <div class="col-md-8">
+                    <label for="keyword" class="form-label fw-bold">
+                        <i class="fas fa-search me-1"></i>Tìm kiếm danh mục
+                    </label>
+                    <input type="text" 
+                           class="form-control form-control-custom" 
+                           id="keyword"
+                           name="keyword" 
+                           placeholder="Nhập tên danh mục hoặc mô tả..." 
+                           value="<%= searchKeyword %>">
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-gradient-primary flex-fill">
+                            <i class="fas fa-search me-1"></i>Tìm kiếm
+                        </button>
+                        <% if (!searchKeyword.isEmpty()) { %>
+                        <a href="<%= request.getContextPath() %>/category" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        <% } %>
+                    </div>
+                </div>
             </form>
+            
+            <% if (!searchKeyword.isEmpty()) { %>
+            <div class="mt-3">
+                <div class="search-highlight d-inline-block">
+                    <i class="fas fa-search me-1"></i>
+                    Kết quả tìm kiếm cho: "<%= searchKeyword %>"
+                </div>
+            </div>
+            <% } %>
+        </div>
 
-            <!-- Categories Table -->
+        <!-- Categories Table -->
+        <div class="categories-table-container">
+            <div class="table-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Danh Sách Danh Mục
+                    <% if (!searchKeyword.isEmpty()) { %>
+                        <small class="opacity-75">(Có <%= categories.size() %> kết quả)</small>
+                    <% } %>
+                </h5>
+            </div>
+            
             <% if (categories.isEmpty()) { %>
-                <div class="no-data">
+                <div class="empty-state">
                     <% if (searchKeyword.isEmpty()) { %>
-                        Chưa có danh mục nào. <a href="category?action=add">Tạo danh mục đầu tiên</a>
+                        <i class="fas fa-folder-open"></i>
+                        <h5>Chưa có danh mục nào</h5>
+                        <p class="text-muted">Hãy tạo danh mục đầu tiên của bạn</p>
+                        <a href="<%= request.getContextPath() %>/category?action=add" class="btn btn-gradient-primary">
+                            <i class="fas fa-plus me-2"></i>Tạo danh mục đầu tiên
+                        </a>
                     <% } else { %>
-                        Không tìm thấy danh mục nào phù hợp với từ khóa "<%= searchKeyword %>"
+                        <i class="fas fa-search"></i>
+                        <h5>Không tìm thấy kết quả</h5>
+                        <p class="text-muted">Không có danh mục nào phù hợp với từ khóa "<%= searchKeyword %>"</p>
+                        <a href="<%= request.getContextPath() %>/category" class="btn btn-gradient-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Xem tất cả danh mục
+                        </a>
                     <% } %>
                 </div>
             <% } else { %>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Hình ảnh</th>
-                            <th>Tên danh mục</th>
-                            <th>Mô tả</th>
-                            <th>Người tạo</th>
-                            <th>Trạng thái</th>
-                            <th>Ngày tạo</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% for (Category category : categories) { %>
-                        <tr>
-                            <td><%= category.getId() %></td>
-                            <td>
-                                <% if (category.getImage() != null && !category.getImage().isEmpty()) { %>
-                                    <img src="<%= category.getImage() %>" alt="Category Image" class="category-image">
-                                <% } else { %>
-                                    <div class="category-image" style="background-color: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                                        📁
-                                    </div>
-                                <% } %>
-                            </td>
-                            <td><strong><%= category.getName() %></strong></td>
-                            <td>
-                                <% if (category.getDescription() != null && !category.getDescription().isEmpty()) { %>
-                                    <%= category.getDescription().length() > 50 ? 
-                                        category.getDescription().substring(0, 50) + "..." : 
-                                        category.getDescription() %>
-                                <% } else { %>
-                                    <em>Chưa có mô tả</em>
-                                <% } %>
-                            </td>
-                            <td><%= category.getUserFullname() %></td>
-                            <td>
-                                <span class="status-badge <%= category.isStatus() ? "status-active" : "status-inactive" %>">
-                                    <%= category.getStatusText() %>
-                                </span>
-                            </td>
-                            <td>
-                                <% if (category.getCreatedDate() != null) { %>
-                                    <%= category.getCreatedDate().toLocalDate() %>
-                                <% } %>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <% if (currentUser.getRoleid() == 1 || category.getUserId() == currentUser.getId()) { %>
-                                        <a href="category?action=edit&id=<%= category.getId() %>" class="btn btn-warning">Sửa</a>
-                                        <a href="category?action=toggle&id=<%= category.getId() %>" 
-                                           class="btn <%= category.isStatus() ? "btn-secondary" : "btn-success" %>"
-                                           onclick="return confirm('Bạn có chắc muốn thay đổi trạng thái?')">
-                                            <%= category.isStatus() ? "Tắt" : "Bật" %>
-                                        </a>
-                                        <a href="category?action=delete&id=<%= category.getId() %>" 
-                                           class="btn btn-danger"
-                                           onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">
-                                            Xóa
-                                        </a>
+                <div class="table-responsive">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th width="5%">ID</th>
+                                <th width="10%">Hình ảnh</th>
+                                <th width="20%">Tên danh mục</th>
+                                <th width="25%">Mô tả</th>
+                                <th width="15%">Người tạo</th>
+                                <th width="10%">Trạng thái</th>
+                                <th width="10%">Ngày tạo</th>
+                                <th width="15%">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (Category category : categories) { %>
+                            <tr>
+                                <td class="fw-bold text-primary">#<%= category.getId() %></td>
+                                <td>
+                                    <% if (category.getImage() != null && !category.getImage().isEmpty()) { %>
+                                        <img src="<%= category.getImage() %>" 
+                                             alt="Category Image" 
+                                             class="category-image-cell">
                                     <% } else { %>
-                                        <span class="btn btn-secondary" style="opacity: 0.5;">Chỉ xem</span>
+                                        <div class="category-placeholder">
+                                            <i class="fas fa-folder"></i>
+                                        </div>
                                     <% } %>
-                                </div>
-                            </td>
-                        </tr>
-                        <% } %>
-                    </tbody>
-                </table>
+                                </td>
+                                <td>
+                                    <strong><%= category.getName() %></strong>
+                                </td>
+                                <td>
+                                    <% if (category.getDescription() != null && !category.getDescription().isEmpty()) { %>
+                                        <% if (category.getDescription().length() > 80) { %>
+                                            <span title="<%= category.getDescription() %>">
+                                                <%= category.getDescription().substring(0, 80) %>...
+                                            </span>
+                                        <% } else { %>
+                                            <%= category.getDescription() %>
+                                        <% } %>
+                                    <% } else { %>
+                                        <em class="text-muted">Chưa có mô tả</em>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar-small me-2">
+                                            <%= category.getUserFullname().substring(0, 1).toUpperCase() %>
+                                        </div>
+                                        <%= category.getUserFullname() %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge <%= category.isStatus() ? "status-active" : "status-inactive" %>">
+                                        <i class="fas fa-circle me-1"></i>
+                                        <%= category.isStatus() ? "Hoạt động" : "Ngừng hoạt động" %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <% if (category.getCreatedDate() != null) { %>
+                                        <small><%= category.getCreatedDate().toLocalDate() %></small>
+                                    <% } else { %>
+                                        <small class="text-muted">N/A</small>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <% if (currentUser != null && (currentUser.getRoleid() == 1 || category.getUserId() == currentUser.getId())) { %>
+                                            <a href="<%= request.getContextPath() %>/category?action=edit&id=<%= category.getId() %>" 
+                                               class="btn btn-warning btn-action">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="<%= request.getContextPath() %>/category?action=toggle&id=<%= category.getId() %>" 
+                                               class="btn <%= category.isStatus() ? "btn-secondary" : "btn-success" %> btn-action"
+                                               onclick="return confirm('Bạn có chắc muốn thay đổi trạng thái?')"
+                                               title="<%= category.isStatus() ? "Tắt" : "Bật" %> danh mục">
+                                                <i class="fas fa-<%= category.isStatus() ? "toggle-off" : "toggle-on" %>"></i>
+                                            </a>
+                                            <a href="<%= request.getContextPath() %>/category?action=delete&id=<%= category.getId() %>" 
+                                               class="btn btn-danger btn-action"
+                                               onclick="return confirm('Bạn có chắc muốn xóa danh mục này? Thao tác này không thể hoàn tác!')"
+                                               title="Xóa danh mục">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        <% } else { %>
+                                            <span class="badge bg-light text-dark">
+                                                <i class="fas fa-eye me-1"></i>Chỉ xem
+                                            </span>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
             <% } %>
         </div>
     </div>
 
-    <script>
-        // Auto hide success/error messages after 5 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                alert.style.transition = 'opacity 0.5s';
-                alert.style.opacity = '0';
-                setTimeout(function() {
-                    alert.remove();
-                }, 500);
-            });
-        }, 5000);
-    </script>
+    <!-- Include Footer -->
+    <jsp:include page="components/footer.jsp" />
+
+    <style>
+        .user-avatar-small {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+    </style>
 </body>
 </html>

@@ -1,10 +1,10 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="true" %>
 <%@ page import="com.login.logindemo.model.Category" %>
 <%@ page import="com.login.logindemo.model.User" %>
 <%
     // Check if user is logged in
     if (session.getAttribute("user") == null) {
-        response.sendRedirect("login");
+        response.sendRedirect(request.getContextPath() + "/login");
         return;
     }
     
@@ -33,464 +33,553 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= isEdit ? "Sửa" : "Thêm" %> Danh Mục - Hệ Thống Quản Lý</title>
+    <title><%= isEdit ? "Chỉnh Sửa" : "Thêm" %> Danh Mục - Hệ Thống Quản Lý</title>
+    
+    <!-- Include Header -->
+    <jsp:include page="components/header.jsp" />
+    
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-
-        /* Navbar (synced with homepage) */
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 15px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-container {
-            max-width: 1200px;
+        .form-container {
+            max-width: 800px;
             margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: #333;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background-color: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            color: white;
-            margin: 0;
-            font-size: 28px;
-        }
-
-        .btn {
-            padding: 8px 16px;
+        .form-card {
+            background: white;
             border: none;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-body {
+            padding: 2rem;
+        }
+
+        .image-preview-container {
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+
+        .image-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #545b62;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 24px;
-            font-size: 16px;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .alert {
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-group .help-text {
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 5px;
+        .remove-image:hover {
+            background: #dc3545;
+            transform: scale(1.1);
         }
 
         .form-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 30px;
-            padding-top: 20px;
+            background: #f8f9fa;
+            padding: 1.5rem 2rem;
             border-top: 1px solid #dee2e6;
         }
 
-        .image-preview {
-            max-width: 200px;
-            max-height: 200px;
-            border-radius: 6px;
-            margin-top: 10px;
-            border: 1px solid #ddd;
+        .breadcrumb-custom {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .breadcrumb-custom .breadcrumb {
+            margin-bottom: 0;
+            background: transparent;
         }
 
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-            margin: 0;
+        .breadcrumb-custom .breadcrumb-item + .breadcrumb-item::before {
+            content: "›";
+            font-size: 1.2rem;
+            color: #6c757d;
         }
 
-        .required {
-            color: red;
+        .character-count {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            align-items: start;
+        .character-count.warning {
+            color: #ffc107;
+        }
+
+        .character-count.danger {
+            color: #dc3545;
+        }
+
+        .form-tips {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-tips h6 {
+            color: #1976d2;
+            margin-bottom: 1rem;
+        }
+
+        .form-tips ul {
+            margin-bottom: 0;
+            padding-left: 1.2rem;
+        }
+
+        .form-tips li {
+            color: #424242;
+            margin-bottom: 0.5rem;
         }
 
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
+            .form-header {
+                padding: 1.5rem;
             }
             
+            .form-body,
             .form-actions {
-                flex-direction: column;
+                padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation synced with homepage -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="home" class="logo">🏠 Hệ Thống Quản Lý</a>
-            <div class="nav-links">
-                <a href="home" class="nav-link">Trang Chủ</a>
-                <a href="category" class="nav-link active">Danh Mục</a>
-                <a href="profile.jsp" class="nav-link">Hồ Sơ</a>
-            </div>
-            <div class="user-info">
-                <a href="logout" class="nav-link" onclick="return confirm('Bạn có chắc muốn đăng xuất?')">Đăng xuất</a>
-            </div>
-        </div>
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb-custom">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="<%= request.getContextPath() %>/" class="text-decoration-none">
+                        <i class="fas fa-home me-1"></i>Trang chủ
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="<%= request.getContextPath() %>/category" class="text-decoration-none">
+                        <i class="fas fa-folder me-1"></i>Danh mục
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    <i class="fas fa-<%= isEdit ? "edit" : "plus" %> me-1"></i>
+                    <%= isEdit ? "Chỉnh sửa" : "Thêm mới" %>
+                </li>
+            </ol>
     </nav>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1><%= isEdit ? "Sửa" : "Thêm" %> Danh Mục</h1>
-            <div style="display: flex; gap: 10px;">
-                <a href="home" class="btn btn-secondary">🏠 Trang chủ</a>
-                <a href="category" class="btn btn-secondary">← Danh sách</a>
-            </div>
-        </div>
 
-        <!-- Main Content -->
-        <div class="card">
+        <div class="form-container">
             <!-- Messages -->
             <% if (error != null && !error.isEmpty()) { %>
-                <div class="alert alert-error">
+                <div class="alert alert-danger alert-custom">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
                     <%= error %>
                 </div>
             <% } %>
 
             <% if (success != null && !success.isEmpty()) { %>
-                <div class="alert alert-success">
+                <div class="alert alert-success alert-custom">
+                    <i class="fas fa-check-circle me-2"></i>
                     <%= success %>
                 </div>
             <% } %>
 
-            <!-- Form -->
-            <form action="category" method="post" id="categoryForm" enctype="application/x-www-form-urlencoded">
-                <input type="hidden" name="action" value="<%= isEdit ? "update" : "create" %>">
+            <!-- Form Tips -->
+            <div class="form-tips">
+                <h6><i class="fas fa-lightbulb me-2"></i>Hướng dẫn tạo danh mục</h6>
+                <ul>
+                    <li>Tên danh mục nên ngắn gọn, rõ ràng và dễ hiểu</li>
+                    <li>Mô tả chi tiết giúp người dùng hiểu rõ hơn về danh mục</li>
+                    <li>Hình ảnh nên có kích thước phù hợp (khuyến nghị 400x300px)</li>
+                    <li>Kiểm tra kỹ thông tin trước khi lưu</li>
+                </ul>
+            </div>
+
+            <!-- Form Card -->
+            <div class="form-card">
+                <!-- Header -->
+                <div class="form-header">
+                    <i class="fas fa-<%= isEdit ? "edit" : "folder-plus" %> fa-2x mb-3"></i>
+                    <h1><%= isEdit ? "Chỉnh Sửa Danh Mục" : "Thêm Danh Mục Mới" %></h1>
+                    <p class="mb-0">
+                        <%= isEdit ? "Cập nhật thông tin danh mục" : "Điền thông tin để tạo danh mục mới" %>
+                    </p>
+                </div>
+
+                <!-- Form Body -->
+                <div class="form-body">
+                    <form action="<%= request.getContextPath() %>/category" method="post" id="categoryForm" novalidate>
                 <% if (isEdit) { %>
+                            <input type="hidden" name="action" value="update">
                 <input type="hidden" name="id" value="<%= category.getId() %>">
+                        <% } else { %>
+                            <input type="hidden" name="action" value="create">
                 <% } %>
 
-                <div class="form-row">
-                    <div>
                         <!-- Category Name -->
-                        <div class="form-group">
-                            <label for="name">Tên danh mục <span class="required">*</span></label>
+                        <div class="mb-4">
+                            <label for="name" class="form-label fw-bold">
+                                <i class="fas fa-tag me-2"></i>Tên danh mục <span class="text-danger">*</span>
+                            </label>
                             <input type="text" 
+                                   class="form-control form-control-custom" 
                                    id="name" 
                                    name="name" 
                                    value="<%= name %>" 
                                    placeholder="Nhập tên danh mục"
-                                   required
-                                   maxlength="255">
-                            <div class="help-text">Tối đa 255 ký tự</div>
+                                   maxlength="100"
+                                   required>
+                            <div class="character-count">
+                                <span id="nameCount">0</span>/100 ký tự
+                            </div>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên danh mục (3-100 ký tự).
+                            </div>
                         </div>
 
-                        <!-- Description -->
-                        <div class="form-group">
-                            <label for="description">Mô tả</label>
-                            <textarea id="description" 
+                        <!-- Category Description -->
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-bold">
+                                <i class="fas fa-align-left me-2"></i>Mô tả
+                            </label>
+                            <textarea class="form-control form-control-custom" 
+                                      id="description" 
                                       name="description" 
-                                      placeholder="Nhập mô tả cho danh mục"
+                                      rows="4"
+                                      placeholder="Nhập mô tả chi tiết về danh mục..."
                                       maxlength="500"><%= description %></textarea>
-                            <div class="help-text">Tối đa 500 ký tự</div>
+                            <div class="character-count">
+                                <span id="descCount">0</span>/500 ký tự
+                            </div>
+                            <small class="form-text text-muted">
+                                Mô tả chi tiết giúp người dùng hiểu rõ hơn về danh mục này.
+                            </small>
                         </div>
 
-                        <!-- Image URL -->
-                        <div class="form-group">
-                            <label for="image">URL hình ảnh</label>
+                        <!-- Category Image -->
+                        <div class="mb-4">
+                            <label for="image" class="form-label fw-bold">
+                                <i class="fas fa-image me-2"></i>Hình ảnh danh mục
+                            </label>
                             <input type="url" 
+                                   class="form-control form-control-custom" 
                                    id="image" 
                                    name="image" 
                                    value="<%= image %>" 
-                                   placeholder="https://example.com/image.jpg"
-                                   onchange="previewImage()">
-                            <div class="help-text">Nhập URL của hình ảnh đại diện cho danh mục</div>
-                        </div>
-
-                        <!-- Status -->
-                        <div class="form-group">
-                            <label>Trạng thái</label>
-                            <div class="checkbox-group">
-                                <input type="checkbox" 
-                                       id="status" 
-                                       name="status" 
-                                       value="1" 
-                                       <%= isEdit ? (category.isStatus() ? "checked" : "") : "checked" %>>
-                                <label for="status">Hoạt động</label>
-                            </div>
-                            <div class="help-text">Danh mục hoạt động sẽ hiển thị cho người dùng</div>
-                        </div>
+                                   placeholder="https://example.com/image.jpg">
+                            <small class="form-text text-muted">
+                                Nhập URL của hình ảnh hoặc để trống để sử dụng hình mặc định.
+                            </small>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập URL hình ảnh hợp lệ.
                     </div>
 
-                    <div>
                         <!-- Image Preview -->
-                        <div class="form-group">
-                            <label>Xem trước hình ảnh</label>
-                            <div id="imagePreview">
+                            <div class="image-preview-container">
                                 <% if (!image.isEmpty()) { %>
-                                    <img src="<%= image %>" alt="Preview" class="image-preview" id="previewImg">
+                                    <div id="imagePreviewWrapper">
+                                        <img src="<%= image %>" 
+                                             alt="Preview" 
+                                             class="image-preview" 
+                                             id="imagePreview"
+                                             onerror="showImagePlaceholder()">
+                                        <button type="button" class="remove-image" onclick="removeImage()">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 <% } else { %>
-                                    <div style="width: 200px; height: 150px; background-color: #f8f9fa; border: 2px dashed #dee2e6; display: flex; align-items: center; justify-content: center; color: #6c757d; border-radius: 6px;">
-                                        <span>Chưa có hình ảnh</span>
+                                    <div class="image-placeholder" id="imagePlaceholder">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <div>Xem trước hình ảnh sẽ hiển thị ở đây</div>
+                                        <small class="text-muted">Nhập URL hình ảnh bên trên</small>
                                     </div>
                                 <% } %>
                             </div>
                         </div>
-
-                        <% if (isEdit) { %>
-                        <!-- Category Info -->
-                        <div class="form-group">
-                            <label>Thông tin danh mục</label>
-                            <div style="padding: 15px; background-color: #f8f9fa; border-radius: 6px; font-size: 14px;">
-                                <p><strong>ID:</strong> <%= category.getId() %></p>
-                                <p><strong>Người tạo:</strong> <%= category.getUserFullname() %></p>
-                                <p><strong>Ngày tạo:</strong> 
-                                   <% if (category.getCreatedDate() != null) { %>
-                                       <%= category.getCreatedDate().toLocalDate() %>
-                                   <% } %>
-                                </p>
-                                <p><strong>Cập nhật cuối:</strong> 
-                                   <% if (category.getUpdatedDate() != null) { %>
-                                       <%= category.getUpdatedDate().toLocalDate() %>
-                                   <% } %>
-                                </p>
-                            </div>
-                        </div>
-                        <% } %>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Form Actions -->
                 <div class="form-actions">
-                    <a href="category" class="btn btn-secondary">Hủy</a>
-                    <button type="submit" class="btn btn-primary">
+                    <div class="d-flex gap-3 justify-content-end flex-wrap">
+                        <a href="<%= request.getContextPath() %>/category" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Hủy bỏ
+                        </a>
+                        <button type="button" class="btn btn-outline-info" onclick="resetForm()">
+                            <i class="fas fa-undo me-2"></i>Đặt lại
+                        </button>
+                        <button type="submit" form="categoryForm" class="btn btn-gradient-primary">
+                            <i class="fas fa-<%= isEdit ? "save" : "plus" %> me-2"></i>
                         <%= isEdit ? "Cập nhật" : "Tạo danh mục" %>
                     </button>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
+    <!-- Include Footer -->
+    <jsp:include page="components/footer.jsp" />
+
     <script>
-        // Image preview function
-        function previewImage() {
-            const imageUrl = document.getElementById('image').value;
-            const previewContainer = document.getElementById('imagePreview');
+        // Character counting
+        function updateCharacterCount(inputId, countId, maxLength) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(countId);
+            const length = input.value.length;
             
-            if (imageUrl) {
-                // Check if image exists
-                const img = new Image();
-                img.onload = function() {
-                    previewContainer.innerHTML = '<img src="' + imageUrl + '" alt="Preview" class="image-preview" id="previewImg">';
-                };
-                img.onerror = function() {
-                    previewContainer.innerHTML = '<div style="width: 200px; height: 150px; background-color: #f8d7da; border: 2px dashed #f5c6cb; display: flex; align-items: center; justify-content: center; color: #721c24; border-radius: 6px;"><span>URL hình ảnh không hợp lệ</span></div>';
-                };
-                img.src = imageUrl;
+            counter.textContent = length;
+            counter.parentElement.className = 'character-count';
+            
+            if (length > maxLength * 0.8) {
+                counter.parentElement.classList.add('warning');
+            }
+            if (length > maxLength * 0.95) {
+                counter.parentElement.classList.add('danger');
+            }
+        }
+
+        // Initialize character counts
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCharacterCount('name', 'nameCount', 100);
+            updateCharacterCount('description', 'descCount', 500);
+            
+            // Add event listeners
+            document.getElementById('name').addEventListener('input', function() {
+                updateCharacterCount('name', 'nameCount', 100);
+                if (this.classList.contains('is-invalid') && this.value.trim()) {
+                    this.classList.remove('is-invalid');
+                }
+            });
+            
+            document.getElementById('description').addEventListener('input', function() {
+                updateCharacterCount('description', 'descCount', 500);
+            });
+        });
+
+        // Image preview
+        document.getElementById('image').addEventListener('input', function() {
+            const url = this.value.trim();
+            if (url) {
+                showImagePreview(url);
             } else {
-                previewContainer.innerHTML = '<div style="width: 200px; height: 150px; background-color: #f8f9fa; border: 2px dashed #dee2e6; display: flex; align-items: center; justify-content: center; color: #6c757d; border-radius: 6px;"><span>Chưa có hình ảnh</span></div>';
+                showImagePlaceholder();
+            }
+            
+            if (this.classList.contains('is-invalid') && isValidUrl(url)) {
+                this.classList.remove('is-invalid');
+            }
+        });
+
+        function showImagePreview(url) {
+            const placeholder = document.getElementById('imagePlaceholder');
+            const wrapper = document.getElementById('imagePreviewWrapper');
+            
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+            
+            if (!wrapper) {
+                const container = document.querySelector('.image-preview-container');
+                container.innerHTML = `
+                    <div id="imagePreviewWrapper">
+                        <img src="${url}" 
+                             alt="Preview" 
+                             class="image-preview" 
+                             id="imagePreview"
+                             onerror="showImagePlaceholder()">
+                        <button type="button" class="remove-image" onclick="removeImage()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                document.getElementById('imagePreview').src = url;
+                wrapper.style.display = 'block';
+            }
+        }
+
+        function showImagePlaceholder() {
+            const wrapper = document.getElementById('imagePreviewWrapper');
+            const placeholder = document.getElementById('imagePlaceholder');
+            
+            if (wrapper) {
+                wrapper.style.display = 'none';
+            }
+            
+            if (!placeholder) {
+                const container = document.querySelector('.image-preview-container');
+                container.innerHTML = `
+                    <div class="image-placeholder" id="imagePlaceholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <div>Xem trước hình ảnh sẽ hiển thị ở đây</div>
+                        <small class="text-muted">Nhập URL hình ảnh bên trên</small>
+                    </div>
+                `;
+            } else {
+                placeholder.style.display = 'flex';
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('image').value = '';
+            showImagePlaceholder();
+        }
+
+        function isValidUrl(string) {
+            try {
+                const url = new URL(string);
+                return url.protocol === 'http:' || url.protocol === 'https:';
+            } catch (_) {
+                return false;
             }
         }
 
         // Form validation
         document.getElementById('categoryForm').addEventListener('submit', function(e) {
-            const name = document.getElementById('name').value.trim();
+            e.preventDefault();
             
-            if (name === '') {
-                alert('Vui lòng nhập tên danh mục!');
-                e.preventDefault();
-                return;
-            }
+            const form = this;
+            const name = document.getElementById('name');
+            const image = document.getElementById('image');
             
-            if (name.length > 255) {
-                alert('Tên danh mục không được vượt quá 255 ký tự!');
-                e.preventDefault();
-                return;
-            }
-            
-            const description = document.getElementById('description').value;
-            if (description.length > 500) {
-                alert('Mô tả không được vượt quá 500 ký tự!');
-                e.preventDefault();
-                return;
-            }
-        });
+            let isValid = true;
 
-        // Character counting
-        document.getElementById('name').addEventListener('input', function() {
-            const current = this.value.length;
-            const max = 255;
-            const helpText = this.parentNode.querySelector('.help-text');
-            helpText.textContent = `${current}/${max} ký tự`;
-            helpText.style.color = current > max * 0.9 ? '#dc3545' : '#6c757d';
-        });
-
-        document.getElementById('description').addEventListener('input', function() {
-            const current = this.value.length;
-            const max = 500;
-            const helpText = this.parentNode.querySelector('.help-text');
-            helpText.textContent = `${current}/${max} ký tự`;
-            helpText.style.color = current > max * 0.9 ? '#dc3545' : '#6c757d';
-        });
-
-        // Focus first input on page load
-        window.onload = function() {
-            document.getElementById('name').focus();
-        };
-
-        // Auto hide success/error messages after 5 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                alert.style.transition = 'opacity 0.5s';
-                alert.style.opacity = '0';
-                setTimeout(function() {
-                    alert.remove();
-                }, 500);
+            // Reset validation
+            [name, image].forEach(field => {
+                field.classList.remove('is-invalid', 'is-valid');
             });
-        }, 5000);
+
+            // Validate name
+            if (!name.value.trim() || name.value.trim().length < 3) {
+                name.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                name.classList.add('is-valid');
+            }
+
+            // Validate image URL (if provided)
+            if (image.value.trim() && !isValidUrl(image.value.trim())) {
+                image.classList.add('is-invalid');
+                isValid = false;
+            } else if (image.value.trim()) {
+                image.classList.add('is-valid');
+            }
+
+            if (isValid) {
+                // Add loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
+                
+                // Submit form
+                form.submit();
+            }
+        });
+
+        // Reset form
+        function resetForm() {
+            if (confirm('Bạn có chắc muốn đặt lại form? Tất cả dữ liệu đã nhập sẽ bị xóa.')) {
+                document.getElementById('categoryForm').reset();
+                document.querySelectorAll('.form-control').forEach(field => {
+                    field.classList.remove('is-invalid', 'is-valid');
+                });
+                updateCharacterCount('name', 'nameCount', 100);
+                updateCharacterCount('description', 'descCount', 500);
+                showImagePlaceholder();
+            }
+        }
+
+        // Auto-save to localStorage (optional feature)
+        function autoSave() {
+            const formData = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                image: document.getElementById('image').value
+            };
+            localStorage.setItem('categoryFormData', JSON.stringify(formData));
+        }
+
+        function loadAutoSave() {
+            const saved = localStorage.getItem('categoryFormData');
+            if (saved && <%= !isEdit %>) { // Only for new categories
+                const data = JSON.parse(saved);
+                if (confirm('Có dữ liệu form đã lưu trước đó. Bạn có muốn khôi phục?')) {
+                    document.getElementById('name').value = data.name || '';
+                    document.getElementById('description').value = data.description || '';
+                    document.getElementById('image').value = data.image || '';
+                    
+                    updateCharacterCount('name', 'nameCount', 100);
+                    updateCharacterCount('description', 'descCount', 500);
+                    
+                    if (data.image) {
+                        showImagePreview(data.image);
+                    }
+                }
+            }
+        }
+
+        // Auto-save every 30 seconds
+        <% if (!isEdit) { %>
+        setInterval(autoSave, 30000);
+        window.addEventListener('load', loadAutoSave);
+        <% } %>
+
+        // Clear auto-save on successful submit
+        window.addEventListener('beforeunload', function() {
+            if (document.querySelector('.alert-success')) {
+                localStorage.removeItem('categoryFormData');
+            }
+        });
     </script>
 </body>
 </html>

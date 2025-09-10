@@ -48,6 +48,16 @@ public class UserService {
             return null;
         }
     }
+
+    /**
+     * Update user profile fields (fullname, phone, optional avatar)
+     */
+    public boolean updateProfile(int userId, String fullname, String phone, String avatarRelativePathOrNull) {
+        if (userId <= 0) return false;
+        if (fullname == null || fullname.trim().isEmpty()) return false;
+        if (phone == null) phone = "";
+        return userDAO.updateProfile(userId, fullname.trim(), phone.trim(), avatarRelativePathOrNull);
+    }
     
     /**
      * Check if username exists
